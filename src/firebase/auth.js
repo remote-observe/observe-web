@@ -5,7 +5,8 @@ import {prodConfig, devConfig} from './config';
 !firebase.apps.length &&
   firebase.initializeApp(
     window.location.hostname.includes('localhost') ||
-      window.location.hostname.includes('ielocal')
+      window.location.hostname.includes('ielocal') ||
+      window.location.hostname.includes('remote-observe-dev.firebaseapp.com')
       ? devConfig
       : prodConfig,
   );
@@ -18,10 +19,10 @@ window.firebase = firebase;
 
 export function signIn() {
   return auth()
-    .setPersistence(firebase.auth.Auth.Persistence.NONE)
+    .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(function() {
       return auth()
-        .signInWithPopup(provider)
+        .signInWithRedirect(provider)
         .then(result => result.user)
         .then(user => {
           return auth().currentUser;
@@ -31,7 +32,22 @@ export function signIn() {
 
 export function signOut() {
   localStorage.removeItem('user');
-  auth.signOut();
+  auth().signOut();
+}
+
+export function useLoggedInUser() {
+  const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    var unsubscribe = firebase.auth().onAuthStateChanged(firebaseUser => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  return [user, loading];
 }
 
 export function getUser() {

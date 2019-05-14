@@ -9,14 +9,26 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Scoped } from 'kremling';
-// import Menu from '@material-ui/core/Menu';
-// import MenuItem from '@material-ui/core/MenuItem';
-// import { fade } from '@material-ui/core/styles/colorManipulator';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import {signOut} from './firebase/auth.js';
 
 const classes = {};
 const isMenuOpen = false;
 
 export default function Navbar({user}) {
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Scoped css={css}>
     <AppBar position="static">
@@ -44,10 +56,26 @@ export default function Navbar({user}) {
           <IconButton
             aria-owns={isMenuOpen ? 'material-appbar' : undefined}
             aria-haspopup="true"
-            onClick={() => {}}
+            onClick={handleMenu}
             color="inherit">
             {(user && user.photoURL) ? <img className="profile-photo" src={user.photoURL} alt="User profile" /> : <AccountCircle /> }
           </IconButton>
+          <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={open}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={signOut}>Logout</MenuItem>
+                </Menu>
         </div>
         <div className={classes.sectionMobile}>
           <IconButton

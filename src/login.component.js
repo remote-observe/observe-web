@@ -5,17 +5,16 @@ import google from './images/google.svg';
 import {Scoped} from 'kremling';
 import {signIn} from './firebase/auth.js';
 
-export default function LoginDialog({user, setUser}) {
+export default function LoginDialog({user}) {
 
   return (
     <Scoped css={css}>
       <Dialog onClose={() => {}} open={!user} aria-labelledby="Login">
-        <div class="wrapper">
+        <div className="wrapper">
           <div>
             <Fab
               onClick={() =>
                 signIn()
-                  .then(setUser)
                   .catch(error => console.error(error))
               }
               color="primary"
