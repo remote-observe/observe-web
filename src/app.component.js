@@ -1,13 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {UserContext, getUser, hasAccess} from './firebase/auth.js';
+import {UserContext, useLoggedInUser, hasAccess} from './firebase/auth.js';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import LoginDialog from './login.component.js';
 import Navbar from './navbar.component.js';
 import Observatory from './observatory/observatory.component.js';
 
 export default function App() {
-  const [user, setUser] = useState(getUser());
-  const [userHasAccess, setHasAccess] = useState(false);
+  const [user, loading] = useLoggedInUser();
+  const [userHasAccess, setHasAccess] = useState(null);
+  console.log('loading', loading);
 
   useEffect(
     () => {
@@ -19,10 +21,16 @@ export default function App() {
     [user],
   );
 
+  console.log(user);
+
   return (
     <UserContext.Provider value={{user, userHasAccess}}>
       <Navbar user={user} />
-      {userHasAccess ? (
+      {(loading || userHasAccess == null) ? (
+        <div style={{marginTop: 300, display: 'flex', justifyContent: 'center'}}>
+          <CircularProgress />
+        </div>
+      ) : userHasAccess ? (
         <Observatory />
       ) : user ? (
         <div>
@@ -31,8 +39,10 @@ export default function App() {
           </Typography>
           <div>Public information about the observatory</div>
         </div>
-      ) : <div>Public information about the observatory</div>}
-      <LoginDialog user={user} setUser={setUser} />
+      ) : (
+        <div>Public information about the observatory</div>
+      )}
+      {!loading && <LoginDialog user={user} />}
     </UserContext.Provider>
   );
 }

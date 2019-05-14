@@ -10,7 +10,6 @@ export default function Observatory() {
       .collection('observatories')
       .where("name", "==", "rovor")
       .onSnapshot(({docs}) => {
-        debugger;
         setObsData(docs[0].data())
       }),
     []
